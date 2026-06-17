@@ -1,0 +1,68 @@
+{
+  "collections": [
+    {
+      "name": "products",
+      "description": "Store products catalogue",
+      "documentId": "product_id",
+      "fields": [
+        {
+          "name": "categoryId",
+          "type": "string",
+          "description": "ID of the category this product belongs to"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "description": "Name of the product"
+        },
+        {
+          "name": "price",
+          "type": "number",
+          "description": "Price of the product"
+        },
+        {
+          "name": "imageUrl",
+          "type": "string",
+          "description": "Optional image URL for the product",
+          "optional": true
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "description": "Optional description of the product",
+          "optional": true
+        }
+      ],
+      "access": "PUBLIC_READ_ADMIN_WRITE"
+    },
+    {
+      "name": "categories",
+      "description": "Store categories",
+      "documentId": "category_id",
+      "fields": [
+        {
+          "name": "name",
+          "type": "string",
+          "description": "Name of the category"
+        }
+      ],
+      "access": "PUBLIC_READ_ADMIN_WRITE"
+    },
+    {
+      "name": "settings",
+      "description": "Store settings",
+      "documentId": "setting_id",
+      "fields": [
+        {
+          "name": "whatsappNumber",
+          "type": "string",
+          "description": "WhatsApp number for orders"
+        }
+      ],
+      "access": "PUBLIC_READ_ADMIN_WRITE"
+    }
+  ],
+  "accessDefinitions": {
+    "PUBLIC_READ_ADMIN_WRITE": "allow read: if true; allow write: if request.auth != null;"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Pastelarica Delivery",
+  "description": "Catálogo online e delivery para a Pastelarica, com integração direto ao WhatsApp e painel administrativo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
