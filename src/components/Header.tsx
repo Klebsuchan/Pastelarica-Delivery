@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShoppingBag, Settings, Search } from 'lucide-react';
-import logoUrl from '../pastelarica.png';
+
+const logoUrl = '/pastelarica.png';
 
 interface HeaderProps {
   cartItemCount: number;
