@@ -14,7 +14,7 @@ interface HeaderProps {
 
 export function Header({ cartItemCount, onOpenCart, onNavigate, searchQuery, onSearchChange, showSearch }: HeaderProps) {
   return (
-    <header className="bg-black/90 backdrop-blur-md p-4 sticky top-0 z-40 border-b border-[#1A1A1A] shadow-xl">
+    <header className="bg-black/90 backdrop-blur-md px-4 pb-4 pt-[calc(1rem+env(safe-area-inset-top))] sticky top-0 z-40 border-b border-[#1A1A1A] shadow-xl">
       <div className="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex w-full md:w-auto justify-between items-center">
           <div 

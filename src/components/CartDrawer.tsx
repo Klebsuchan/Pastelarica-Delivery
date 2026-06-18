@@ -107,7 +107,7 @@ export function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantity, setti
           )}
 
           {cartItems.length > 0 && (
-            <form onSubmit={handleCheckout} className="mt-auto bg-[#FF7A00] p-6 rounded-3xl border border-[#FF7A00] text-black shadow-[0_0_40px_rgba(255,122,0,0.2)] shrink-0 relative overflow-hidden">
+            <form onSubmit={handleCheckout} className="mt-auto bg-[#FF7A00] px-6 pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] rounded-3xl border border-[#FF7A00] text-black shadow-[0_0_40px_rgba(255,122,0,0.2)] shrink-0 relative overflow-hidden">
               <div className="absolute inset-0 bg-black/5"></div>
               <div className="relative z-10">
                 <h3 className="font-black text-xl mb-6 italic uppercase underline decoration-black/30 underline-offset-4">Finalizar Pedido</h3>

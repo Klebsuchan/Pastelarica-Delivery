@@ -114,7 +114,7 @@ export default function App() {
           settings={settings}
         />
 
-        <footer className="bg-[#050505] py-16 border-t border-zinc-900 mt-auto relative z-20">
+        <footer className="bg-[#050505] pt-16 pb-[calc(4rem+env(safe-area-inset-bottom))] border-t border-zinc-900 mt-auto relative z-20">
           <div className="max-w-6xl mx-auto px-6 flex flex-col items-center">
             
             {/* Branding & Subtitle */}
