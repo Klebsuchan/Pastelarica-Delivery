@@ -41,36 +41,31 @@ export function useStore() {
   const [settings, setSettings] = useState<StoreSettings>(INITIAL_SETTINGS);
 
   useEffect(() => {
-    // Wait for auth to be ready before seeding
-    const unsubAuth = auth.onAuthStateChanged(user => {
-      if (user) {
-        const seedInitialData = async () => {
-          try {
-            await setDoc(doc(db, 'settings', 'main'), { whatsappNumber: '5554984276299' }, { merge: true });
-          } catch (e) {
-            console.error(e);
-          }
-          const isSeeded = localStorage.getItem('pastelarica_seeded_v2');
-          if (!isSeeded) {
-            try {
-              const batch = writeBatch(db);
-              INITIAL_CATEGORIES.forEach(cat => {
-                batch.set(doc(collection(db, 'categories'), cat.id), cat);
-              });
-              INITIAL_PRODUCTS.forEach(prod => {
-                batch.set(doc(collection(db, 'products'), prod.id), prod);
-              });
-              batch.set(doc(db, 'settings', 'main'), INITIAL_SETTINGS);
-              await batch.commit();
-              localStorage.setItem('pastelarica_seeded_v2', 'true');
-            } catch (error) {
-              console.error("Error seeding initial data:", error);
-            }
-          }
-        };
-        seedInitialData();
+    const seedInitialData = async () => {
+      try {
+        await setDoc(doc(db, 'settings', 'main'), { whatsappNumber: '5554984276299' }, { merge: true });
+      } catch (e) {
+        console.error(e);
       }
-    });
+      const isSeeded = localStorage.getItem('pastelarica_seeded_v2');
+      if (!isSeeded) {
+        try {
+          const batch = writeBatch(db);
+          INITIAL_CATEGORIES.forEach(cat => {
+            batch.set(doc(collection(db, 'categories'), cat.id), cat);
+          });
+          INITIAL_PRODUCTS.forEach(prod => {
+            batch.set(doc(collection(db, 'products'), prod.id), prod);
+          });
+          batch.set(doc(db, 'settings', 'main'), INITIAL_SETTINGS);
+          await batch.commit();
+          localStorage.setItem('pastelarica_seeded_v2', 'true');
+        } catch (error) {
+          console.error("Error seeding initial data:", error);
+        }
+      }
+    };
+    seedInitialData();
 
     const unsubProducts = onSnapshot(collection(db, 'products'), (snapshot) => {
       const fetchedProducts: Product[] = [];
@@ -92,7 +87,6 @@ export function useStore() {
       if (snapshot.empty) {
         setCategories(INITIAL_CATEGORIES);
       } else {
-        // Sort categories to maintain some order, e.g., by ID
         setCategories(fetchedCategories.sort((a, b) => a.id.localeCompare(b.id)));
       }
     });
@@ -100,11 +94,12 @@ export function useStore() {
     const unsubSettings = onSnapshot(doc(db, 'settings', 'main'), (doc) => {
       if (doc.exists()) {
         setSettings(doc.data() as StoreSettings);
+      } else {
+        setSettings(INITIAL_SETTINGS);
       }
     });
 
     return () => {
-      unsubAuth();
       unsubProducts();
       unsubCategories();
       unsubSettings();

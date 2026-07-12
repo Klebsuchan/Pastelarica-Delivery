@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Product, Category, StoreSettings } from '../types';
-import { Plus, Edit2, Trash2, Save, X, LogIn, FileDown } from 'lucide-react';
+import { Plus, Edit2, Trash2, Save, X, LogIn, FileDown, LogOut } from 'lucide-react';
 import toast from 'react-hot-toast';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -29,13 +29,17 @@ export function AdminPanel({
   const [whatsapp, setWhatsapp] = useState(settings.whatsappNumber);
   const [formData, setFormData] = useState<Partial<Product>>({});
   
+  const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return sessionStorage.getItem('admin_auth') === 'true';
   });
-  const [password, setPassword] = useState('');
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    // Auth is handled via simple password now
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password === 'pastelarica123') {
       setIsAuthenticated(true);
@@ -44,6 +48,12 @@ export function AdminPanel({
     } else {
       toast.error('Senha incorreta.');
     }
+  };
+
+  const handleLogout = async () => {
+    setIsAuthenticated(false);
+    sessionStorage.removeItem('admin_auth');
+    toast.success('Você saiu da sessão administrativa.');
   };
 
   const generatePDF = async () => {
@@ -140,6 +150,45 @@ export function AdminPanel({
     setIsAdding(false);
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        const dataUrl = canvas.toDataURL('image/webp', 0.7); // webp is usually smaller
+        setFormData(prev => ({ ...prev, imageUrl: dataUrl }));
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isAdding) {
@@ -183,14 +232,25 @@ export function AdminPanel({
     <div className="max-w-4xl mx-auto p-4 py-8 space-y-8 bg-black text-white">
       <div className="flex items-center justify-between border-b pb-4 border-zinc-900 flex-wrap gap-4">
         <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase">Painel <span className="text-[#FF7A00]">Admin</span></h2>
-        <button
-          onClick={generatePDF}
-          disabled={isGeneratingPDF}
-          className="bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 text-xs uppercase tracking-widest disabled:opacity-50"
-        >
-          <FileDown size={16} />
-          {isGeneratingPDF ? 'Gerando...' : 'Gerar Catálogo PDF'}
-        </button>
+        
+        <div className="flex gap-2">
+          <button
+            onClick={generatePDF}
+            disabled={isGeneratingPDF}
+            className="bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 text-xs uppercase tracking-widest disabled:opacity-50"
+          >
+            <FileDown size={16} />
+            {isGeneratingPDF ? 'Gerando...' : 'Catálogo'}
+          </button>
+          
+          <button
+            onClick={handleLogout}
+            className="bg-red-500/10 hover:bg-red-500/20 text-red-500 px-4 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 text-xs uppercase tracking-widest"
+          >
+            <LogOut size={16} />
+            Sair
+          </button>
+        </div>
       </div>
 
       {/* Settings Section */}
@@ -279,14 +339,18 @@ export function AdminPanel({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-black text-[#9ca3af] uppercase mb-2 tracking-widest">URL da Imagem</label>
-                  <input 
-                    type="url" 
-                    value={formData.imageUrl || ''}
-                    onChange={e => setFormData({...formData, imageUrl: e.target.value})}
-                    placeholder="https://..."
-                    className="w-full bg-[#050505] border border-[#1A1A1A] rounded-xl px-4 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-[#FF7A00]/50 transition-all"
-                  />
+                  <label className="block text-xs font-black text-[#9ca3af] uppercase mb-2 tracking-widest">Imagem do Produto</label>
+                  <div className="flex items-center gap-4">
+                    {formData.imageUrl && (
+                      <img src={formData.imageUrl} alt="Preview" className="w-12 h-12 rounded-xl object-cover border border-[#1A1A1A] shrink-0" />
+                    )}
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="w-full bg-[#050505] border border-[#1A1A1A] rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#FF7A00]/50 transition-all text-xs"
+                    />
+                  </div>
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-xs font-black text-[#9ca3af] uppercase mb-2 tracking-widest">Descrição detalhada</label>
